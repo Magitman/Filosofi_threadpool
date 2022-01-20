@@ -9,31 +9,28 @@ public class Philosopher extends Thread {
         start();
     }
 
-    private synchronized void think() {
+    private void think() {
         System.out.println(this + "\tStart thinking");
         try {
-            sleep((long) Math.random() * 1000);
+            sleep((long)Math.random()*1000);
         } catch (InterruptedException e) {
             System.out.println("Error in class \"Philosopher\". Message: " + e.getMessage());
         }
     }
 
-    private synchronized void eat() {
-        System.out.println(this + " waiting for left chopstick..." + this.rightChop.chopstickNumber());
-        synchronized (this.leftChop) {
-            System.out.println(this + " just got the left chop");
-            System.out.println(this + " waiting for right chopstick..." + this.rightChop.chopstickNumber());
-            synchronized (this.rightChop) {
-                try {
-                    System.out.println(this + "\tEating...");
-                    sleep((long) Math.random() * 1000);
-                } catch (InterruptedException e) {
-                    System.out.println("Error in class \"Philosopher\". Message: " + e.getMessage());
-                }
-                System.out.println(this + " released right chopstick " + this.rightChop.chopstickNumber());
-            }
-            System.out.println(this + " released left chopstick " + this.rightChop.chopstickNumber());
+    private void eat() {
+        this.leftChop.grab(this);
+        this.rightChop.grab(this);
+
+        try {
+            sleep((long)Math.random()*1000);
+        } catch (InterruptedException e) {
+            System.out.println("Error in class \"Philosopher\". Message: " + e.getMessage());
         }
+        System.out.println(this + "\tFinished eating!");
+
+        this.rightChop.release(this);
+        this.leftChop.release(this);
     }
 
     @Override
